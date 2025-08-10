@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earned It 서비스 이용약관</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: A single-page application with a sticky side navigation menu. This structure allows users to quickly jump to specific articles of the Terms of Service without linear scrolling. The main content area is a single scrollable column containing themed sections. This is more user-friendly than a simple text document, as it provides both a quick overview and easy access to details. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Article 2 (Definitions) -> Goal: Clarify key terms -> Presentation: Two-column layout with icons for quick recognition -> Interaction: None -> Justification: Improves readability and comprehension of core concepts.
+        - Report Info: Article 5 (Service Details) -> Goal: Showcase app features -> Presentation: A series of cards, each with an icon and description -> Interaction: None -> Justification: More visually engaging than a simple bulleted list.
+        - Report Info: Article 6 (Withdrawal Policy) -> Goal: Clearly explain the data policy after account deletion -> Presentation: An interactive timeline diagram created with HTML/CSS Flexbox -> Interaction: Click-to-reveal details for each stage of the timeline -> Justification: Visualizes a time-based process, making complex information highly digestible.
+        - Report Info: Other legal articles -> Goal: Provide full legal text accessibly -> Presentation: Accordion (details/summary tags) for lengthy but important sections like "User Obligations" to keep the initial view clean -> Interaction: Expand/collapse -> Justification: Reduces initial cognitive load while keeping all information accessible.
+        - Library/Method: Vanilla JavaScript for smooth scrolling and IntersectionObserver for active navigation link highlighting. Chart.js/Plotly not needed as there is no quantitative data to chart.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans KR', 'Inter', sans-serif;
+        }
+        /* Custom style for smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+        /* Active state for navigation links */
+        .nav-link.active {
+            background-color: #FBBF24; /* amber-400 */
+            color: #1F2937; /* gray-800 */
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-gray-800">
+
+    <div class="container mx-auto max-w-6xl px-4 py-8 md:py-12">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900">Earned It 서비스 이용약관</h1>
+            <p class="mt-4 text-lg text-gray-600">시행일자: 2025년 8월 11일</p>
+        </header>
+
+        <div class="flex flex-col md:flex-row md:space-x-8">
+            <!-- Sticky Navigation -->
+            <aside class="md:w-1/4 mb-8 md:mb-0">
+                <nav id="table-of-contents" class="sticky top-8 bg-white p-4 rounded-lg shadow-sm">
+                    <h3 class="font-bold text-lg mb-3">목차</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#section-1" class="nav-link block w-full text-left px-4 py-2 rounded-md text-gray-700 hover:bg-amber-100 transition-colors duration-200">제1조: 목적</a></li>
+                        <li><a href="#section-2" class="nav-link block w-full text-left px-4 py-2 rounded-md text-gray-700 hover:bg-amber-100 transition-colors duration-200">제2조: 용어 정의</a></li>
+                        <li><a href="#section-5" class="nav-link block w-full text-left px-4 py-2 rounded-md text-gray-700 hover:bg-amber-100 transition-colors duration-200">제5조: 서비스 내용</a></li>
+                        <li><a href="#section-6" class="nav-link block w-full text-left px-4 py-2 rounded-md text-gray-700 hover:bg-amber-100 transition-colors duration-200">제6조: 회원 탈퇴 정책</a></li>
+                        <li><a href="#section-7" class="nav-link block w-full text-left px-4 py-2 rounded-md text-gray-700 hover:bg-amber-100 transition-colors duration-200">제7조: 회원의 의무</a></li>
+                        <li><a href="#section-details" class="nav-link block w-full text-left px-4 py-2 rounded-md text-gray-700 hover:bg-amber-100 transition-colors duration-200">기타 조항</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="md:w-3/4 space-y-12">
+                <section id="section-1" class="scroll-mt-24 bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4">제1조: 목적</h2>
+                    <p class="text-gray-700 leading-relaxed">이 약관은 (주)언드잇(이하 "회사")이 제공하는 Earned It 서비스(이하 "서비스")의 이용과 관련하여 회사와 회원 간의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.</p>
+                </section>
+
+                <section id="section-2" class="scroll-mt-24 bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4">제2조: 용어 정의</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-4">
+                            <span class="text-2xl mt-1">📱</span>
+                            <div>
+                                <h3 class="font-semibold">서비스</h3>
+                                <p class="text-gray-700">회원이 자신의 수익 정보를 등록하고, 실시간 누적 금액을 확인하며 위시리스트 및 퍼즐 콘텐츠를 이용할 수 있도록 회사가 제공하는 모든 Earned It 관련 서비스를 의미합니다.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <span class="text-2xl mt-1">👤</span>
+                            <div>
+                                <h3 class="font-semibold">회원</h3>
+                                <p class="text-gray-700">서비스에 접속하여 약관에 동의하고 이용계약을 체결한 고객을 말합니다.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <span class="text-2xl mt-1">🛒</span>
+                            <div>
+                                <h3 class="font-semibold">위시리스트</h3>
+                                <p class="text-gray-700">회원이 구매를 희망하는 상품의 정보를 등록하고 관리하는 기능입니다.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <span class="text-2xl mt-1">🧩</span>
+                            <div>
+                                <h3 class="font-semibold">퍼즐</h3>
+                                <p class="text-gray-700">서비스 이용 중 특정 조건을 만족할 경우 획득하는 조각을 모아 테마를 완성하는 콘텐츠입니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="section-5" class="scroll-mt-24 bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4">제5조: 서비스 내용</h2>
+                    <p class="text-gray-600 mb-6">Earned It은 다음과 같은 핵심 기능을 제공합니다.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="bg-slate-100 p-4 rounded-lg flex items-center space-x-4">
+                            <span class="text-3xl">💰</span>
+                            <p class="font-medium">수익 정보 등록 및 자동 계산</p>
+                        </div>
+                        <div class="bg-slate-100 p-4 rounded-lg flex items-center space-x-4">
+                            <span class="text-3xl">⏱️</span>
+                            <p class="font-medium">실시간 누적 금액 추적</p>
+                        </div>
+                        <div class="bg-slate-100 p-4 rounded-lg flex items-center space-x-4">
+                            <span class="text-3xl">🛍️</span>
+                            <p class="font-medium">위시리스트 관리 (Star/All)</p>
+                        </div>
+                        <div class="bg-slate-100 p-4 rounded-lg flex items-center space-x-4">
+                            <span class="text-3xl">🧩</span>
+                            <p class="font-medium">퍼즐 조각 수집 및 테마 완성</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="section-6" class="scroll-mt-24 bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4">제6조: 회원 탈퇴 정책</h2>
+                    <p class="text-gray-600 mb-6">회원 탈퇴 시, 데이터는 아래 정책에 따라 처리됩니다.</p>
+                    <div id="withdrawal-timeline" class="relative pl-8">
+                        <!-- Timeline line -->
+                        <div class="absolute left-4 top-2 bottom-2 w-0.5 bg-gray-200"></div>
+                        
+                        <div class="timeline-item mb-8 relative">
+                            <div class="timeline-dot absolute left-[-5px] top-2 w-4 h-4 bg-amber-400 rounded-full border-4 border-white"></div>
+                            <h3 class="font-bold text-lg cursor-pointer">탈퇴 신청</h3>
+                            <div class="timeline-details mt-2 text-gray-700">
+                                <p>서비스 내 '마이페이지'에서 언제든지 탈퇴를 신청할 수 있습니다.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item mb-8 relative">
+                            <div class="timeline-dot absolute left-[-5px] top-2 w-4 h-4 bg-amber-400 rounded-full border-4 border-white"></div>
+                            <h3 class="font-bold text-lg cursor-pointer">탈퇴 후 30일 이내</h3>
+                            <div class="timeline-details mt-2 text-gray-700 hidden">
+                                <p>계정 복구를 위해 데이터가 임시 보관됩니다. 이 기간 동안 동일 이메일로 로그인 시 계정을 복구할 수 있으며, 신규 가입은 제한됩니다.</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item mb-8 relative">
+                            <div class="timeline-dot absolute left-[-5px] top-2 w-4 h-4 bg-amber-400 rounded-full border-4 border-white"></div>
+                            <h3 class="font-bold text-lg cursor-pointer">탈퇴 후 30일 이후</h3>
+                            <div class="timeline-details mt-2 text-gray-700 hidden">
+                                <p>계정 데이터는 복구 불가능한 상태로 처리됩니다. 동일 이메일로 신규 회원가입이 가능하며, 이 경우 기존 데이터는 승계되지 않습니다.</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item relative">
+                            <div class="timeline-dot absolute left-[-5px] top-2 w-4 h-4 bg-amber-400 rounded-full border-4 border-white"></div>
+                            <h3 class="font-bold text-lg cursor-pointer">탈퇴 후 3년 이후</h3>
+                            <div class="timeline-details mt-2 text-gray-700 hidden">
+                                <p>개인정보 보호법에 의거하여 회원의 모든 개인정보가 완전히 삭제(Hard Delete)됩니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="section-7" class="scroll-mt-24 bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4">제7조: 회원의 의무</h2>
+                    <details class="group">
+                        <summary class="flex justify-between items-center font-medium cursor-pointer list-none">
+                            <span>회원으로서 지켜야 할 주요 사항들입니다. (클릭하여 자세히 보기)</span>
+                            <span class="transition group-open:rotate-180">
+                                <span class="text-2xl">▾</span>
+                            </span>
+                        </summary>
+                        <div class="text-gray-700 mt-4 leading-relaxed">
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li>타인의 정보를 도용하는 행위</li>
+                                <li>회사가 게시한 정보를 무단으로 변경하는 행위</li>
+                                <li>회사의 운영을 고의로 방해하는 행위</li>
+                                <li>기타 불법적이거나 부당한 행위</li>
+                                <li>회원은 관계법, 약관 규정, 이용안내 및 공지된 주의사항을 준수해야 합니다.</li>
+                            </ul>
+                        </div>
+                    </details>
+                </section>
+
+                <section id="section-details" class="scroll-mt-24 bg-white p-6 rounded-lg shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4">기타 조항</h2>
+                    <div class="space-y-6">
+                        <details class="group">
+                            <summary class="flex justify-between items-center font-medium cursor-pointer list-none">
+                                <span>제3조: 약관의 게시와 개정</span>
+                                <span class="transition group-open:rotate-180"><span class="text-2xl">▾</span></span>
+                            </summary>
+                            <p class="text-gray-700 mt-3 leading-relaxed">회사는 이 약관의 내용을 회원이 쉽게 알 수 있도록 서비스 내 또는 연결화면에 게시합니다. 관련 법을 위배하지 않는 범위에서 약관을 개정할 수 있으며, 개정 시 최소 7일 전(회원에게 불리한 경우 30일 전)에 공지합니다.</p>
+                        </details>
+                        <hr>
+                        <details class="group">
+                            <summary class="flex justify-between items-center font-medium cursor-pointer list-none">
+                                <span>제4조: 회원가입</span>
+                                <span class="transition group-open:rotate-180"><span class="text-2xl">▾</span></span>
+                            </summary>
+                            <p class="text-gray-700 mt-3 leading-relaxed">회원가입은 약관 동의 후 신청하고 회사가 승낙함으로써 체결됩니다. 허위 정보 기재, 과거 자격 상실 이력 등이 있을 경우 승낙이 거절되거나 사후에 계약이 해지될 수 있습니다.</p>
+                        </details>
+                        <hr>
+                        <details class="group">
+                            <summary class="flex justify-between items-center font-medium cursor-pointer list-none">
+                                <span>제8조: 책임 제한</span>
+                                <span class="transition group-open:rotate-180"><span class="text-2xl">▾</span></span>
+                            </summary>
+                            <p class="text-gray-700 mt-3 leading-relaxed">회사는 천재지변 등 불가항력, 회원의 귀책사유로 인한 서비스 장애, 회원이 게재한 정보의 신뢰도 및 정확성에 대해서는 책임을 지지 않습니다.</p>
+                        </details>
+                        <hr>
+                        <details class="group">
+                            <summary class="flex justify-between items-center font-medium cursor-pointer list-none">
+                                <span>제9조: 준거법 및 재판관할</span>
+                                <span class="transition group-open:rotate-180"><span class="text-2xl">▾</span></span>
+                            </summary>
+                            <p class="text-gray-700 mt-3 leading-relaxed">회사와 회원 간의 소송은 대한민국법을 준거법으로 하며, 민사소송법상의 관할법원에 제소합니다.</p>
+                        </details>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = document.querySelectorAll('main section');
+            const navLinks = document.querySelectorAll('#table-of-contents .nav-link');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.4
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${entry.target.id}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            const timelineItems = document.querySelectorAll('#withdrawal-timeline .timeline-item h3');
+            timelineItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const details = item.nextElementSibling;
+                    details.classList.toggle('hidden');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
