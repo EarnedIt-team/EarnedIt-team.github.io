@@ -7,212 +7,614 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Warm Neutrals -->
-    <!-- Application Structure Plan: A single-page application with a sticky side navigation menu. This structure allows users to quickly jump to specific articles of the Terms of Service without linear scrolling. The main content area is a single scrollable column containing themed sections. This is more user-friendly than a simple text document, as it provides both a quick overview and easy access to details. -->
-    <!-- Visualization & Content Choices: 
-        - Report Info: Article 2 (Definitions) -> Goal: Clarify key terms -> Presentation: Two-column layout with icons for quick recognition -> Interaction: None -> Justification: Improves readability and comprehension of core concepts.
-        - Report Info: Article 5 (Service Details) -> Goal: Showcase app features -> Presentation: A series of cards, each with an icon and description -> Interaction: None -> Justification: More visually engaging than a simple bulleted list.
-        - Report Info: Article 6 (Withdrawal Policy) -> Goal: Clearly explain the data policy after account deletion -> Presentation: An interactive timeline diagram created with HTML/CSS Flexbox -> Interaction: Click-to-reveal details for each stage of the timeline -> Justification: Visualizes a time-based process, making complex information highly digestible.
-        - Report Info: Other legal articles -> Goal: Provide full legal text accessibly -> Presentation: Accordion (details/summary tags) for lengthy but important sections like "User Obligations" to keep the initial view clean -> Interaction: Expand/collapse -> Justification: Reduces initial cognitive load while keeping all information accessible.
-        - Library/Method: Vanilla JavaScript for smooth scrolling and IntersectionObserver for active navigation link highlighting. Chart.js/Plotly not needed as there is no quantitative data to chart.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #f59e0b;
+            --accent-color: #10b981;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --border-color: #e5e7eb;
+        }
+
         body {
             font-family: 'Noto Sans KR', 'Inter', sans-serif;
+            line-height: 1.7;
         }
-        /* Custom style for smooth scrolling */
-        html {
-            scroll-behavior: smooth;
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-        /* Active state for navigation links */
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .nav-link {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            transition: width 0.3s ease;
+            z-index: -1;
+        }
+
+        .nav-link:hover::before,
+        .nav-link.active::before {
+            width: 100%;
+        }
+
+        .nav-link:hover,
         .nav-link.active {
-            background-color: #FBBF24; /* amber-400 */
-            color: #1F2937; /* gray-800 */
-            font-weight: 700;
+            color: white;
+            transform: translateX(8px);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.5rem;
+            width: 12px;
+            height: 12px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px var(--primary-color);
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 1.5rem;
+            width: 2px;
+            height: calc(100% + 1rem);
+            background: var(--border-color);
+        }
+
+        .timeline-item:last-child::after {
+            display: none;
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .search-highlight {
+            background: linear-gradient(120deg, #fbbf24 0%, #f59e0b 100%);
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.8); }
+        }
+
+        .pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+
+        .print-button {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+        }
+
+        @media print {
+            .print-button, nav, .search-container {
+                display: none !important;
+            }
         }
     </style>
 </head>
-<body class="bg-slate-50 text-gray-800">
+<body class="bg-gray-50 text-gray-800">
 
-    <div class="container mx-auto max-w-6xl px-4 py-8 md:py-12">
-        <header class="text-center mb-12">
-            <h1 class="text-4xl md:text-5xl font-bold text-gray-900">Earned It 서비스 이용약관</h1>
-            <p class="mt-4 text-lg text-gray-600">시행일자: 2025년 8월 11일</p>
-        </header>
+    <!-- Header with Hero Section -->
+    <header class="gradient-bg text-white">
+        <div class="container mx-auto max-w-6xl px-4 py-16">
+            <div class="text-center">
+                <div class="mb-6">
+                    <i class="fas fa-shield-alt text-6xl mb-4"></i>
+                    <h1 class="text-5xl md:text-6xl font-bold mb-4">Earned It 서비스 이용약관</h1>
+                    <p class="text-xl md:text-2xl text-blue-100 mb-6">투명하고 안전한 서비스 이용을 위한 약관입니다</p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                        <div class="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-6 py-3">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>시행일자: 2025년 8월 11일</span>
+                        </div>
+                        <div class="flex items-center space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-6 py-3">
+                            <i class="fas fa-clock"></i>
+                            <span>최종 업데이트: 2025년 8월</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
 
-        <div class="flex flex-col md:flex-row md:space-x-8">
-            <!-- Sticky Navigation -->
-            <aside class="md:w-1/4 mb-8 md:mb-0">
-                <nav id="table-of-contents" class="sticky top-8 bg-white p-4 rounded-lg shadow-sm">
-                    <h3 class="font-bold text-lg mb-3">목차</h3>
+    <!-- Search Container -->
+    <div class="search-container bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="container mx-auto max-w-6xl px-4 py-4">
+            <div class="relative">
+                <input type="text" id="searchInput" placeholder="약관 내용을 검색해보세요..." 
+                       class="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto max-w-6xl px-4 py-8">
+        <div class="flex flex-col lg:flex-row lg:space-x-8">
+            <!-- Enhanced Sticky Navigation -->
+            <aside class="lg:w-1/4 mb-8 lg:mb-0">
+                <nav id="table-of-contents" class="sticky top-24 bg-white p-6 rounded-xl shadow-lg border border-gray-100">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <i class="fas fa-list-ul text-blue-600"></i>
+                        <h3 class="font-bold text-xl text-gray-900">목차</h3>
+                    </div>
                     <ul class="space-y-2">
-                        <li><a href="#section-1" class="nav-link block w-full text-left px-4 py-2 rounded-md text-gray-700 hover:bg-amber-100 transition-colors duration-200">제1조: 목적</a></li>
-                        <li><a href="#section-2" class="nav-link block w-full text-left px-4 py-2 rounded-md text-gray-700 hover:bg-amber-100 transition-colors duration-200">제2조: 용어 정의</a></li>
-                        <li><a href="#section-5" class="nav-link block w-full text-left px-4 py-2 rounded-md text-gray-700 hover:bg-amber-100 transition-colors duration-200">제5조: 서비스 내용</a></li>
-                        <li><a href="#section-6" class="nav-link block w-full text-left px-4 py-2 rounded-md text-gray-700 hover:bg-amber-100 transition-colors duration-200">제6조: 회원 탈퇴 정책</a></li>
-                        <li><a href="#section-7" class="nav-link block w-full text-left px-4 py-2 rounded-md text-gray-700 hover:bg-amber-100 transition-colors duration-200">제7조: 회원의 의무</a></li>
-                        <li><a href="#section-details" class="nav-link block w-full text-left px-4 py-2 rounded-md text-gray-700 hover:bg-amber-100 transition-colors duration-200">기타 조항</a></li>
+                        <li>
+                            <a href="#section-1" class="nav-link block w-full text-left px-4 py-3 rounded-lg text-gray-700 font-medium">
+                                <i class="fas fa-bullseye mr-3 text-blue-500"></i>제1조: 목적
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#section-2" class="nav-link block w-full text-left px-4 py-3 rounded-lg text-gray-700 font-medium">
+                                <i class="fas fa-book mr-3 text-green-500"></i>제2조: 용어 정의
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#section-5" class="nav-link block w-full text-left px-4 py-3 rounded-lg text-gray-700 font-medium">
+                                <i class="fas fa-cogs mr-3 text-purple-500"></i>제5조: 서비스 내용
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#section-6" class="nav-link block w-full text-left px-4 py-3 rounded-lg text-gray-700 font-medium">
+                                <i class="fas fa-user-times mr-3 text-red-500"></i>제6조: 회원 탈퇴 정책
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#section-7" class="nav-link block w-full text-left px-4 py-3 rounded-lg text-gray-700 font-medium">
+                                <i class="fas fa-handshake mr-3 text-orange-500"></i>제7조: 회원의 의무
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#section-details" class="nav-link block w-full text-left px-4 py-3 rounded-lg text-gray-700 font-medium">
+                                <i class="fas fa-file-contract mr-3 text-gray-500"></i>기타 조항
+                            </a>
+                        </li>
                     </ul>
+                    
+                    <!-- Quick Stats -->
+                    <div class="mt-8 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
+                        <h4 class="font-semibold text-gray-900 mb-3">약관 요약</h4>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">총 조항 수</span>
+                                <span class="font-semibold text-blue-600">9개</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">핵심 기능</span>
+                                <span class="font-semibold text-green-600">4가지</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600">데이터 보관</span>
+                                <span class="font-semibold text-orange-600">3년</span>
+                            </div>
+                        </div>
+                    </div>
                 </nav>
             </aside>
 
-            <!-- Main Content -->
-            <main class="md:w-3/4 space-y-12">
-                <section id="section-1" class="scroll-mt-24 bg-white p-6 rounded-lg shadow-sm">
-                    <h2 class="text-2xl font-bold mb-4">제1조: 목적</h2>
-                    <p class="text-gray-700 leading-relaxed">이 약관은 (주)언드잇(이하 "회사")이 제공하는 Earned It 서비스(이하 "서비스")의 이용과 관련하여 회사와 회원 간의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.</p>
-                </section>
-
-                <section id="section-2" class="scroll-mt-24 bg-white p-6 rounded-lg shadow-sm">
-                    <h2 class="text-2xl font-bold mb-4">제2조: 용어 정의</h2>
-                    <div class="space-y-4">
-                        <div class="flex items-start space-x-4">
-                            <span class="text-2xl mt-1">📱</span>
-                            <div>
-                                <h3 class="font-semibold">서비스</h3>
-                                <p class="text-gray-700">회원이 자신의 수익 정보를 등록하고, 실시간 누적 금액을 확인하며 위시리스트 및 퍼즐 콘텐츠를 이용할 수 있도록 회사가 제공하는 모든 Earned It 관련 서비스를 의미합니다.</p>
-                            </div>
+            <!-- Enhanced Main Content -->
+            <main class="lg:w-3/4 space-y-8">
+                <section id="section-1" class="scroll-mt-32 fade-in bg-white p-8 rounded-xl shadow-lg border border-gray-100 card-hover">
+                    <div class="flex items-center space-x-4 mb-6">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-bullseye text-blue-600 text-xl"></i>
                         </div>
-                        <div class="flex items-start space-x-4">
-                            <span class="text-2xl mt-1">👤</span>
-                            <div>
-                                <h3 class="font-semibold">회원</h3>
-                                <p class="text-gray-700">서비스에 접속하여 약관에 동의하고 이용계약을 체결한 고객을 말합니다.</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start space-x-4">
-                            <span class="text-2xl mt-1">🛒</span>
-                            <div>
-                                <h3 class="font-semibold">위시리스트</h3>
-                                <p class="text-gray-700">회원이 구매를 희망하는 상품의 정보를 등록하고 관리하는 기능입니다.</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start space-x-4">
-                            <span class="text-2xl mt-1">🧩</span>
-                            <div>
-                                <h3 class="font-semibold">퍼즐</h3>
-                                <p class="text-gray-700">서비스 이용 중 특정 조건을 만족할 경우 획득하는 조각을 모아 테마를 완성하는 콘텐츠입니다.</p>
-                            </div>
+                        <h2 class="text-3xl font-bold text-gray-900">제1조: 목적</h2>
+                    </div>
+                    <div class="prose prose-lg max-w-none">
+                        <p class="text-gray-700 leading-relaxed text-lg">
+                            이 약관은 <strong class="text-blue-600">(주)언드잇</strong>(이하 "회사")이 제공하는 
+                            <span class="bg-gradient-to-r from-blue-100 to-purple-100 px-2 py-1 rounded">Earned It 서비스</span>
+                            (이하 "서비스")의 이용과 관련하여 회사와 회원 간의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.
+                        </p>
+                        <div class="mt-6 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                            <p class="text-blue-800 font-medium">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                이 약관은 회원 여러분의 권리를 보호하고 투명한 서비스 이용을 위한 가이드라인입니다.
+                            </p>
                         </div>
                     </div>
                 </section>
 
-                <section id="section-5" class="scroll-mt-24 bg-white p-6 rounded-lg shadow-sm">
-                    <h2 class="text-2xl font-bold mb-4">제5조: 서비스 내용</h2>
-                    <p class="text-gray-600 mb-6">Earned It은 다음과 같은 핵심 기능을 제공합니다.</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="bg-slate-100 p-4 rounded-lg flex items-center space-x-4">
-                            <span class="text-3xl">💰</span>
-                            <p class="font-medium">수익 정보 등록 및 자동 계산</p>
+                <section id="section-2" class="scroll-mt-32 fade-in bg-white p-8 rounded-xl shadow-lg border border-gray-100 card-hover">
+                    <div class="flex items-center space-x-4 mb-6">
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-book text-green-600 text-xl"></i>
                         </div>
-                        <div class="bg-slate-100 p-4 rounded-lg flex items-center space-x-4">
-                            <span class="text-3xl">⏱️</span>
-                            <p class="font-medium">실시간 누적 금액 추적</p>
-                        </div>
-                        <div class="bg-slate-100 p-4 rounded-lg flex items-center space-x-4">
-                            <span class="text-3xl">🛍️</span>
-                            <p class="font-medium">위시리스트 관리 (Star/All)</p>
-                        </div>
-                        <div class="bg-slate-100 p-4 rounded-lg flex items-center space-x-4">
-                            <span class="text-3xl">🧩</span>
-                            <p class="font-medium">퍼즐 조각 수집 및 테마 완성</p>
-                        </div>
+                        <h2 class="text-3xl font-bold text-gray-900">제2조: 용어 정의</h2>
                     </div>
-                </section>
-
-                <section id="section-6" class="scroll-mt-24 bg-white p-6 rounded-lg shadow-sm">
-                    <h2 class="text-2xl font-bold mb-4">제6조: 회원 탈퇴 정책</h2>
-                    <p class="text-gray-600 mb-6">회원 탈퇴 시, 데이터는 아래 정책에 따라 처리됩니다.</p>
-                    <div id="withdrawal-timeline" class="relative pl-8">
-                        <!-- Timeline line -->
-                        <div class="absolute left-4 top-2 bottom-2 w-0.5 bg-gray-200"></div>
-                        
-                        <div class="timeline-item mb-8 relative">
-                            <h3 class="font-bold text-lg cursor-pointer">탈퇴 신청</h3>
-                            <div class="timeline-details mt-2 text-gray-700">
-                                <p>서비스 내 '마이페이지'에서 언제든지 탈퇴를 신청할 수 있습니다.</p>
+                    <p class="text-gray-600 mb-8 text-lg">서비스 이용에 필요한 주요 용어들을 명확하게 정의합니다.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl border border-blue-200">
+                            <div class="flex items-center space-x-4 mb-4">
+                                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-mobile-alt text-white"></i>
+                                </div>
+                                <h3 class="font-bold text-xl text-gray-900">서비스</h3>
                             </div>
+                            <p class="text-gray-700">회원이 자신의 수익 정보를 등록하고, 실시간 누적 금액을 확인하며 위시리스트 및 퍼즐 콘텐츠를 이용할 수 있도록 회사가 제공하는 모든 Earned It 관련 서비스를 의미합니다.</p>
                         </div>
                         
-                        <div class="timeline-item mb-8 relative">
-                            <h3 class="font-bold text-lg cursor-pointer">탈퇴 후 30일 이내</h3>
-                            <div class="timeline-details mt-2 text-gray-700 hidden">
-                                <p>계정 복구를 위해 데이터가 임시 보관됩니다. 이 기간 동안 동일 이메일로 로그인 시 계정을 복구할 수 있으며, 신규 가입은 제한됩니다.</p>
+                        <div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl border border-green-200">
+                            <div class="flex items-center space-x-4 mb-4">
+                                <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-user text-white"></i>
+                                </div>
+                                <h3 class="font-bold text-xl text-gray-900">회원</h3>
+                            </div>
+                            <p class="text-gray-700">서비스에 접속하여 약관에 동의하고 이용계약을 체결한 고객을 말합니다.</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl border border-purple-200">
+                            <div class="flex items-center space-x-4 mb-4">
+                                <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-heart text-white"></i>
+                                </div>
+                                <h3 class="font-bold text-xl text-gray-900">위시리스트</h3>
+                            </div>
+                            <p class="text-gray-700">회원이 구매를 희망하는 상품의 정보를 등록하고 관리하는 기능입니다.</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-xl border border-orange-200">
+                            <div class="flex items-center space-x-4 mb-4">
+                                <div class="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-puzzle-piece text-white"></i>
+                                </div>
+                                <h3 class="font-bold text-xl text-gray-900">퍼즐</h3>
+                            </div>
+                            <p class="text-gray-700">서비스 이용 중 특정 조건을 만족할 경우 획득하는 조각을 모아 테마를 완성하는 콘텐츠입니다.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="section-5" class="scroll-mt-32 fade-in bg-white p-8 rounded-xl shadow-lg border border-gray-100 card-hover">
+                    <div class="flex items-center space-x-4 mb-6">
+                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-cogs text-purple-600 text-xl"></i>
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-900">제5조: 서비스 내용</h2>
+                    </div>
+                    <p class="text-gray-600 mb-8 text-lg">Earned It은 다음과 같은 핵심 기능을 제공합니다.</p>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div class="bg-gradient-to-r from-emerald-50 to-emerald-100 p-6 rounded-xl border border-emerald-200 hover:shadow-lg transition-all duration-300">
+                            <div class="flex items-center space-x-4 mb-4">
+                                <div class="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center pulse-glow">
+                                    <i class="fas fa-coins text-white text-xl"></i>
+                                </div>
+                                <h3 class="font-bold text-lg text-gray-900">수익 정보 등록 및 자동 계산</h3>
+                            </div>
+                            <p class="text-gray-700">다양한 수익원을 등록하고 자동으로 누적 금액을 계산해드립니다.</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-xl border border-blue-200 hover:shadow-lg transition-all duration-300">
+                            <div class="flex items-center space-x-4 mb-4">
+                                <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center pulse-glow">
+                                    <i class="fas fa-chart-line text-white text-xl"></i>
+                                </div>
+                                <h3 class="font-bold text-lg text-gray-900">실시간 누적 금액 추적</h3>
+                            </div>
+                            <p class="text-gray-700">실시간으로 수익 변화를 확인하고 목표 달성 현황을 추적합니다.</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-pink-50 to-pink-100 p-6 rounded-xl border border-pink-200 hover:shadow-lg transition-all duration-300">
+                            <div class="flex items-center space-x-4 mb-4">
+                                <div class="w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center pulse-glow">
+                                    <i class="fas fa-shopping-bag text-white text-xl"></i>
+                                </div>
+                                <h3 class="font-bold text-lg text-gray-900">위시리스트 관리</h3>
+                            </div>
+                            <p class="text-gray-700">구매하고 싶은 상품들을 체계적으로 관리하고 우선순위를 설정합니다.</p>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-yellow-50 to-yellow-100 p-6 rounded-xl border border-yellow-200 hover:shadow-lg transition-all duration-300">
+                            <div class="flex items-center space-x-4 mb-4">
+                                <div class="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center pulse-glow">
+                                    <i class="fas fa-trophy text-white text-xl"></i>
+                                </div>
+                                <h3 class="font-bold text-lg text-gray-900">퍼즐 조각 수집</h3>
+                            </div>
+                            <p class="text-gray-700">서비스 이용 시 획득하는 퍼즐 조각을 모아 테마를 완성하는 재미를 제공합니다.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="section-6" class="scroll-mt-32 fade-in bg-white p-8 rounded-xl shadow-lg border border-gray-100 card-hover">
+                    <div class="flex items-center space-x-4 mb-6">
+                        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user-times text-red-600 text-xl"></i>
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-900">제6조: 회원 탈퇴 정책</h2>
+                    </div>
+                    <p class="text-gray-600 mb-8 text-lg">회원 탈퇴 시, 데이터는 아래 정책에 따라 안전하게 처리됩니다.</p>
+                    
+                    <div class="bg-gradient-to-r from-red-50 to-orange-50 p-6 rounded-xl border border-red-200 mb-8">
+                        <div class="flex items-center space-x-3 mb-4">
+                            <i class="fas fa-shield-alt text-red-600 text-xl"></i>
+                            <h3 class="font-bold text-lg text-gray-900">데이터 보호 원칙</h3>
+                        </div>
+                        <p class="text-gray-700">회원의 개인정보는 개인정보보호법에 따라 안전하게 보호되며, 탈퇴 후에도 일정 기간 보관 후 완전히 삭제됩니다.</p>
+                    </div>
+                    
+                    <div id="withdrawal-timeline" class="space-y-8">
+                        <div class="timeline-item">
+                            <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300">
+                                <h3 class="font-bold text-xl text-gray-900 mb-3 cursor-pointer flex items-center justify-between">
+                                    <span><i class="fas fa-sign-out-alt mr-3 text-red-500"></i>탈퇴 신청</span>
+                                    <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                                </h3>
+                                <div class="timeline-details text-gray-700">
+                                    <p class="mb-3">서비스 내 '마이페이지'에서 언제든지 탈퇴를 신청할 수 있습니다.</p>
+                                    <div class="bg-blue-50 p-4 rounded-lg">
+                                        <p class="text-blue-800 font-medium">
+                                            <i class="fas fa-info-circle mr-2"></i>
+                                            탈퇴 신청은 즉시 처리되며, 신중하게 결정해주세요.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300">
+                                <h3 class="font-bold text-xl text-gray-900 mb-3 cursor-pointer flex items-center justify-between">
+                                    <span><i class="fas fa-clock mr-3 text-orange-500"></i>탈퇴 후 30일 이내</span>
+                                    <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                                </h3>
+                                <div class="timeline-details text-gray-700 hidden">
+                                    <p class="mb-3">계정 복구를 위해 데이터가 임시 보관됩니다. 이 기간 동안 동일 이메일로 로그인 시 계정을 복구할 수 있으며, 신규 가입은 제한됩니다.</p>
+                                    <div class="bg-orange-50 p-4 rounded-lg">
+                                        <p class="text-orange-800 font-medium">
+                                            <i class="fas fa-undo mr-2"></i>
+                                            이 기간 동안 계정 복구가 가능합니다.
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="timeline-item mb-8 relative">
-                            <h3 class="font-bold text-lg cursor-pointer">탈퇴 후 30일 이후</h3>
-                            <div class="timeline-details mt-2 text-gray-700 hidden">
-                                <p>계정 데이터는 복구 불가능한 상태로 처리됩니다. 동일 이메일로 신규 회원가입이 가능하며, 이 경우 기존 데이터는 승계되지 않습니다.</p>
+                        <div class="timeline-item">
+                            <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300">
+                                <h3 class="font-bold text-xl text-gray-900 mb-3 cursor-pointer flex items-center justify-between">
+                                    <span><i class="fas fa-calendar-times mr-3 text-yellow-500"></i>탈퇴 후 30일 이후</span>
+                                    <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                                </h3>
+                                <div class="timeline-details text-gray-700 hidden">
+                                    <p class="mb-3">계정 데이터는 복구 불가능한 상태로 처리됩니다. 동일 이메일로 신규 회원가입이 가능하며, 이 경우 기존 데이터는 승계되지 않습니다.</p>
+                                    <div class="bg-yellow-50 p-4 rounded-lg">
+                                        <p class="text-yellow-800 font-medium">
+                                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                                            이 시점부터는 데이터 복구가 불가능합니다.
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="timeline-item relative">
-                            <h3 class="font-bold text-lg cursor-pointer">탈퇴 후 3년 이후</h3>
-                            <div class="timeline-details mt-2 text-gray-700 hidden">
-                                <p>개인정보 보호법에 의거하여 회원의 모든 개인정보가 완전히 삭제(Hard Delete)됩니다.</p>
+                        <div class="timeline-item">
+                            <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200 hover:shadow-lg transition-all duration-300">
+                                <h3 class="font-bold text-xl text-gray-900 mb-3 cursor-pointer flex items-center justify-between">
+                                    <span><i class="fas fa-trash-alt mr-3 text-gray-500"></i>탈퇴 후 3년 이후</span>
+                                    <i class="fas fa-chevron-down text-gray-400 transition-transform"></i>
+                                </h3>
+                                <div class="timeline-details text-gray-700 hidden">
+                                    <p class="mb-3">개인정보 보호법에 의거하여 회원의 모든 개인정보가 완전히 삭제(Hard Delete)됩니다.</p>
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <p class="text-gray-800 font-medium">
+                                            <i class="fas fa-shield-check mr-2"></i>
+                                            법적 요구사항에 따라 완전히 삭제됩니다.
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                <section id="section-7" class="scroll-mt-24 bg-white p-6 rounded-lg shadow-sm">
-                    <h2 class="text-2xl font-bold mb-4">제7조: 회원의 의무</h2>
-                    <details class="group">
-                        <summary class="flex justify-between items-center font-medium cursor-pointer list-none">
-                            <span>회원으로서 지켜야 할 주요 사항들입니다. (클릭하여 자세히 보기)</span>
-                            <span class="transition group-open:rotate-180">
-                                <span class="text-2xl">▾</span>
+                <section id="section-7" class="scroll-mt-32 fade-in bg-white p-8 rounded-xl shadow-lg border border-gray-100 card-hover">
+                    <div class="flex items-center space-x-4 mb-6">
+                        <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-handshake text-orange-600 text-xl"></i>
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-900">제7조: 회원의 의무</h2>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-orange-50 to-yellow-50 p-6 rounded-xl border border-orange-200 mb-6">
+                        <div class="flex items-center space-x-3 mb-4">
+                            <i class="fas fa-lightbulb text-orange-600 text-xl"></i>
+                            <h3 class="font-bold text-lg text-gray-900">회원으로서 지켜야 할 주요 사항들입니다</h3>
+                        </div>
+                        <p class="text-gray-700">아래 내용을 클릭하여 자세한 내용을 확인하세요.</p>
+                    </div>
+                    
+                    <details class="group bg-white border border-gray-200 rounded-xl overflow-hidden">
+                        <summary class="flex justify-between items-center p-6 cursor-pointer hover:bg-gray-50 transition-colors duration-200">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-list-check text-blue-600"></i>
+                                <span class="font-semibold text-lg text-gray-900">회원 의무 상세보기</span>
+                            </div>
+                            <span class="transition-transform group-open:rotate-180">
+                                <i class="fas fa-chevron-down text-gray-400 text-xl"></i>
                             </span>
                         </summary>
-                        <div class="text-gray-700 mt-4 leading-relaxed">
-                            <ul class="list-disc pl-5 space-y-2">
-                                <li>타인의 정보를 도용하는 행위</li>
-                                <li>회사가 게시한 정보를 무단으로 변경하는 행위</li>
-                                <li>회사의 운영을 고의로 방해하는 행위</li>
-                                <li>기타 불법적이거나 부당한 행위</li>
-                                <li>회원은 관계법, 약관 규정, 이용안내 및 공지된 주의사항을 준수해야 합니다.</li>
-                            </ul>
+                        <div class="p-6 bg-gray-50 border-t border-gray-200">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-4">
+                                    <h4 class="font-bold text-gray-900 mb-3">금지 행위</h4>
+                                    <ul class="space-y-3">
+                                        <li class="flex items-start space-x-3">
+                                            <i class="fas fa-times-circle text-red-500 mt-1"></i>
+                                            <span class="text-gray-700">타인의 정보를 도용하는 행위</span>
+                                        </li>
+                                        <li class="flex items-start space-x-3">
+                                            <i class="fas fa-times-circle text-red-500 mt-1"></i>
+                                            <span class="text-gray-700">회사가 게시한 정보를 무단으로 변경하는 행위</span>
+                                        </li>
+                                        <li class="flex items-start space-x-3">
+                                            <i class="fas fa-times-circle text-red-500 mt-1"></i>
+                                            <span class="text-gray-700">회사의 운영을 고의로 방해하는 행위</span>
+                                        </li>
+                                        <li class="flex items-start space-x-3">
+                                            <i class="fas fa-times-circle text-red-500 mt-1"></i>
+                                            <span class="text-gray-700">기타 불법적이거나 부당한 행위</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="space-y-4">
+                                    <h4 class="font-bold text-gray-900 mb-3">준수 사항</h4>
+                                    <ul class="space-y-3">
+                                        <li class="flex items-start space-x-3">
+                                            <i class="fas fa-check-circle text-green-500 mt-1"></i>
+                                            <span class="text-gray-700">관계법령 준수</span>
+                                        </li>
+                                        <li class="flex items-start space-x-3">
+                                            <i class="fas fa-check-circle text-green-500 mt-1"></i>
+                                            <span class="text-gray-700">약관 규정 준수</span>
+                                        </li>
+                                        <li class="flex items-start space-x-3">
+                                            <i class="fas fa-check-circle text-green-500 mt-1"></i>
+                                            <span class="text-gray-700">이용안내 준수</span>
+                                        </li>
+                                        <li class="flex items-start space-x-3">
+                                            <i class="fas fa-check-circle text-green-500 mt-1"></i>
+                                            <span class="text-gray-700">공지된 주의사항 준수</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </details>
                 </section>
 
-                <section id="section-details" class="scroll-mt-24 bg-white p-6 rounded-lg shadow-sm">
-                    <h2 class="text-2xl font-bold mb-4">기타 조항</h2>
+                <section id="section-details" class="scroll-mt-32 fade-in bg-white p-8 rounded-xl shadow-lg border border-gray-100 card-hover">
+                    <div class="flex items-center space-x-4 mb-6">
+                        <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-file-contract text-gray-600 text-xl"></i>
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-900">기타 조항</h2>
+                    </div>
+                    
                     <div class="space-y-6">
-                        <details class="group">
-                            <summary class="flex justify-between items-center font-medium cursor-pointer list-none">
-                                <span>제3조: 약관의 게시와 개정</span>
-                                <span class="transition group-open:rotate-180"><span class="text-2xl">▾</span></span>
+                        <details class="group bg-white border border-gray-200 rounded-xl overflow-hidden">
+                            <summary class="flex justify-between items-center p-6 cursor-pointer hover:bg-gray-50 transition-colors duration-200">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fas fa-edit text-blue-600"></i>
+                                    <span class="font-semibold text-lg text-gray-900">제3조: 약관의 게시와 개정</span>
+                                </div>
+                                <span class="transition-transform group-open:rotate-180">
+                                    <i class="fas fa-chevron-down text-gray-400 text-xl"></i>
+                                </span>
                             </summary>
-                            <p class="text-gray-700 mt-3 leading-relaxed">회사는 이 약관의 내용을 회원이 쉽게 알 수 있도록 서비스 내 또는 연결화면에 게시합니다. 관련 법을 위배하지 않는 범위에서 약관을 개정할 수 있으며, 개정 시 최소 7일 전(회원에게 불리한 경우 30일 전)에 공지합니다.</p>
+                            <div class="p-6 bg-gray-50 border-t border-gray-200">
+                                <p class="text-gray-700 leading-relaxed">
+                                    회사는 이 약관의 내용을 회원이 쉽게 알 수 있도록 서비스 내 또는 연결화면에 게시합니다. 
+                                    관련 법을 위배하지 않는 범위에서 약관을 개정할 수 있으며, 
+                                    <strong class="text-blue-600">개정 시 최소 7일 전(회원에게 불리한 경우 30일 전)에 공지</strong>합니다.
+                                </p>
+                            </div>
                         </details>
-                        <hr>
-                        <details class="group">
-                            <summary class="flex justify-between items-center font-medium cursor-pointer list-none">
-                                <span>제4조: 회원가입</span>
-                                <span class="transition group-open:rotate-180"><span class="text-2xl">▾</span></span>
+                        
+                        <details class="group bg-white border border-gray-200 rounded-xl overflow-hidden">
+                            <summary class="flex justify-between items-center p-6 cursor-pointer hover:bg-gray-50 transition-colors duration-200">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fas fa-user-plus text-green-600"></i>
+                                    <span class="font-semibold text-lg text-gray-900">제4조: 회원가입</span>
+                                </div>
+                                <span class="transition-transform group-open:rotate-180">
+                                    <i class="fas fa-chevron-down text-gray-400 text-xl"></i>
+                                </span>
                             </summary>
-                            <p class="text-gray-700 mt-3 leading-relaxed">회원가입은 약관 동의 후 신청하고 회사가 승낙함으로써 체결됩니다. 허위 정보 기재, 과거 자격 상실 이력 등이 있을 경우 승낙이 거절되거나 사후에 계약이 해지될 수 있습니다.</p>
+                            <div class="p-6 bg-gray-50 border-t border-gray-200">
+                                <p class="text-gray-700 leading-relaxed">
+                                    회원가입은 약관 동의 후 신청하고 회사가 승낙함으로써 체결됩니다. 
+                                    <strong class="text-red-600">허위 정보 기재, 과거 자격 상실 이력</strong> 등이 있을 경우 
+                                    승낙이 거절되거나 사후에 계약이 해지될 수 있습니다.
+                                </p>
+                            </div>
                         </details>
-                        <hr>
-                        <details class="group">
-                            <summary class="flex justify-between items-center font-medium cursor-pointer list-none">
-                                <span>제8조: 책임 제한</span>
-                                <span class="transition group-open:rotate-180"><span class="text-2xl">▾</span></span>
+                        
+                        <details class="group bg-white border border-gray-200 rounded-xl overflow-hidden">
+                            <summary class="flex justify-between items-center p-6 cursor-pointer hover:bg-gray-50 transition-colors duration-200">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fas fa-balance-scale text-purple-600"></i>
+                                    <span class="font-semibold text-lg text-gray-900">제8조: 책임 제한</span>
+                                </div>
+                                <span class="transition-transform group-open:rotate-180">
+                                    <i class="fas fa-chevron-down text-gray-400 text-xl"></i>
+                                </span>
                             </summary>
-                            <p class="text-gray-700 mt-3 leading-relaxed">회사는 천재지변 등 불가항력, 회원의 귀책사유로 인한 서비스 장애, 회원이 게재한 정보의 신뢰도 및 정확성에 대해서는 책임을 지지 않습니다.</p>
+                            <div class="p-6 bg-gray-50 border-t border-gray-200">
+                                <p class="text-gray-700 leading-relaxed">
+                                    회사는 <strong class="text-orange-600">천재지변 등 불가항력, 회원의 귀책사유</strong>로 인한 서비스 장애, 
+                                    회원이 게재한 정보의 신뢰도 및 정확성에 대해서는 책임을 지지 않습니다.
+                                </p>
+                            </div>
                         </details>
-                        <hr>
-                        <details class="group">
-                            <summary class="flex justify-between items-center font-medium cursor-pointer list-none">
-                                <span>제9조: 준거법 및 재판관할</span>
-                                <span class="transition group-open:rotate-180"><span class="text-2xl">▾</span></span>
+                        
+                        <details class="group bg-white border border-gray-200 rounded-xl overflow-hidden">
+                            <summary class="flex justify-between items-center p-6 cursor-pointer hover:bg-gray-50 transition-colors duration-200">
+                                <div class="flex items-center space-x-3">
+                                    <i class="fas fa-gavel text-gray-600"></i>
+                                    <span class="font-semibold text-lg text-gray-900">제9조: 준거법 및 재판관할</span>
+                                </div>
+                                <span class="transition-transform group-open:rotate-180">
+                                    <i class="fas fa-chevron-down text-gray-400 text-xl"></i>
+                                </span>
                             </summary>
-                            <p class="text-gray-700 mt-3 leading-relaxed">회사와 회원 간의 소송은 대한민국법을 준거법으로 하며, 민사소송법상의 관할법원에 제소합니다.</p>
+                            <div class="p-6 bg-gray-50 border-t border-gray-200">
+                                <p class="text-gray-700 leading-relaxed">
+                                    회사와 회원 간의 소송은 <strong class="text-blue-600">대한민국법을 준거법</strong>으로 하며, 
+                                    민사소송법상의 관할법원에 제소합니다.
+                                </p>
+                            </div>
                         </details>
                     </div>
                 </section>
@@ -220,11 +622,38 @@
         </div>
     </div>
 
+    <!-- Print Button -->
+    <button onclick="window.print()" class="print-button bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all duration-300">
+        <i class="fas fa-print text-xl"></i>
+    </button>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12 mt-16">
+        <div class="container mx-auto max-w-6xl px-4">
+            <div class="text-center">
+                <div class="mb-6">
+                    <i class="fas fa-shield-alt text-4xl text-blue-400 mb-4"></i>
+                    <h3 class="text-2xl font-bold mb-2">Earned It</h3>
+                    <p class="text-gray-400">보상을 쉽고 확실하게, Earned It</p>
+                </div>
+                <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-8 text-sm text-gray-400">
+                    <span>© 2025 (주)언드잇. All rights reserved.</span>
+                    <span>|</span>
+                    <span>문의: earnedit9900@gmail.com</span>
+                    <span>|</span>
+                    <span>전화: 아직 없음</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const sections = document.querySelectorAll('main section');
             const navLinks = document.querySelectorAll('#table-of-contents .nav-link');
+            const searchInput = document.getElementById('searchInput');
 
+            // Intersection Observer for active navigation
             const observerOptions = {
                 root: null,
                 rootMargin: '0px',
@@ -248,11 +677,65 @@
                 observer.observe(section);
             });
 
+            // Timeline interaction
             const timelineItems = document.querySelectorAll('#withdrawal-timeline .timeline-item h3');
             timelineItems.forEach(item => {
                 item.addEventListener('click', () => {
-                    const details = item.nextElementSibling;
+                    const details = item.parentElement.querySelector('.timeline-details');
+                    const icon = item.querySelector('.fa-chevron-down');
+                    
                     details.classList.toggle('hidden');
+                    if (icon) {
+                        icon.style.transform = details.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+                    }
+                });
+            });
+
+            // Search functionality
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const contentElements = document.querySelectorAll('main section p, main section h2, main section h3');
+                
+                contentElements.forEach(element => {
+                    const text = element.textContent.toLowerCase();
+                    if (searchTerm && text.includes(searchTerm)) {
+                        element.innerHTML = element.textContent.replace(
+                            new RegExp(searchTerm, 'gi'),
+                            match => `<span class="search-highlight">${match}</span>`
+                        );
+                    } else {
+                        element.innerHTML = element.textContent;
+                    }
+                });
+            });
+
+            // Fade in animation
+            const fadeElements = document.querySelectorAll('.fade-in');
+            const fadeObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            fadeElements.forEach(element => {
+                fadeObserver.observe(element);
+            });
+
+            // Smooth scrolling for navigation links
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href');
+                    const targetSection = document.querySelector(targetId);
+                    
+                    if (targetSection) {
+                        targetSection.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
                 });
             });
         });
