@@ -126,18 +126,6 @@
             animation: pulse-glow 2s infinite;
         }
 
-        .print-button {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            z-index: 1000;
-        }
-
-        @media print {
-            .print-button, nav, .search-container {
-                display: none !important;
-            }
-        }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -621,12 +609,6 @@
             </main>
         </div>
     </div>
-
-    <!-- Print Button -->
-    <!-- <button onclick="window.print()" class="print-button bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all duration-300">
-        <i class="fas fa-print text-xl"></i>
-    </button> -->
-
     <!-- Footer -->
     <footer class="bg-gray-900 text-white py-12 mt-16">
         <div class="container mx-auto max-w-6xl px-4">
